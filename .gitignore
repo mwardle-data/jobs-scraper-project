@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+.idea
+dags
+include
+Lib
+Scripts
+venv_py
+pyvenv.cfg
+__pycache__
+/*.jsonl
