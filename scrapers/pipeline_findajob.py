@@ -9,13 +9,13 @@ from scrapers.findajob_scraper import (
     append_seen_ids,
 )
 
-BUCKET_NAME = "scraped-jobs-raw"  # ← tu wpisz swój bucket
+BUCKET_NAME = "scraped-jobs-raw"
 URLS_FILE = "urls.jsonl"
 JOBS_FILE = "jobs.jsonl"
 
 
 def upload_file(bucket_name: str, source_file: str, dest_blob: str) -> None:
-    """Upload lokalnego pliku do GCS pod wskazaną ścieżką."""
+    # Upload a local file to GCS at the specified path.
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(dest_blob)
@@ -24,7 +24,7 @@ def upload_file(bucket_name: str, source_file: str, dest_blob: str) -> None:
 
 
 def write_new_urls_jsonl(urls, seen_ids, output_file):
-    """Zapisuje tylko nowe URL-e do JSONL i zwraca listę nowych URL-i + pary (job_id, url)."""
+    # It saves only new URLs to the JSONL file and returns a list of new URLs together with job_id - url pairs.
     new_urls = []
     new_seen_pairs = []
     now = datetime.utcnow().isoformat()
@@ -50,25 +50,25 @@ def write_new_urls_jsonl(urls, seen_ids, output_file):
 
 
 def run_pipeline():
-    # 1. Zbieramy wszystkie URL-e
+    # Collecting all URLs.
     urls = get_job_urls()
-    print(f"Zebrano {len(urls)} URL-i")
+    print(f"Collected {len(urls)} URLs")
 
-    # 2. Ładujemy znane job_id
+    # Loading the know job_ids
     seen_ids = load_seen_ids()
-    print(f"Już znanych job_id: {len(seen_ids)}")
+    print(f"Known job_ids: {len(seen_ids)}")
 
-    # 3. Zapisujemy tylko nowe URL-e do urls.jsonl
+    # Saving only new URLs to urls.jsonl
     new_urls, new_seen_pairs = write_new_urls_jsonl(urls, seen_ids, URLS_FILE)
-    print(f"Nowych ogłoszeń: {len(new_urls)}")
+    print(f"New job ads: {len(new_urls)}")
 
-    # 4. Dopisujemy nowe job_id do jobs_seen.jsonl
+    # Appending new job_ids to jobs_seen.jsonl
     append_seen_ids(new_seen_pairs)
 
-    # 5. Scrapujemy tylko nowe ogłoszenia – scrape_jobs zapisuje do jobs.jsonl
+    # Scraping only new job ads (scrape_jobs saves them to jobs.jsonl)
     scrape_jobs(new_urls)
 
-    # 6. Upload plików do GCS
+    # Uploading files to Google Cloud Storage
     today = datetime.utcnow().strftime("%Y-%m-%d")
     upload_file(BUCKET_NAME, URLS_FILE, f"urls/{today}/urls.jsonl")
     upload_file(BUCKET_NAME, JOBS_FILE, f"jobs/{today}/jobs.jsonl")
