@@ -140,13 +140,13 @@ if __name__ == "__main__":
     # 3. Extracting job_ids from URLs and filtering out only new ones
     new_urls = []
     new_seen_pairs = []  # (job_id, url)
-    for url in urls:
-        job_id = url.rstrip("/").split("/")[-1]
-        if job_id in seen_ids:
+    for job_url in urls:
+        job_id_from_url = job_url.rstrip("/").split("/")[-1]
+        if job_id_from_url in seen_ids:
             continue
 
-        new_urls.append(url)
-        new_seen_pairs.append((job_id, url))
+        new_urls.append(job_url)
+        new_seen_pairs.append((job_id_from_url, job_url))
 
     print("Number of new ads to be scraped:", len(new_urls))
 

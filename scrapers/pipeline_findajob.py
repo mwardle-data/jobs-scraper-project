@@ -54,9 +54,9 @@ def run_pipeline():
     urls = get_job_urls()
     print(f"Collected {len(urls)} URLs")
 
-    # Loading the know job_ids
+    # Loading all job_ids that were scraped in previous runs of the pipeline
     seen_ids = load_seen_ids()
-    print(f"Known job_ids: {len(seen_ids)}")
+    print(f"Previously seen job_ids: {len(seen_ids)}")
 
     # Saving only new URLs to urls.jsonl
     new_urls, new_seen_pairs = write_new_urls_jsonl(urls, seen_ids, URLS_FILE)
